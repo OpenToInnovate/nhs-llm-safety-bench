@@ -1,10 +1,6 @@
-
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 type Case = {
   id: string;
@@ -26,75 +22,105 @@ type Result = {
 };
 
 async function main(){
-  const provider = process.env.MODEL_PROVIDER || 'iframe';
+  // Get API key from command line argument
+  const apiKey = process.argv[2];
+  
+  if (!apiKey) {
+    console.error('❌ Error: API key is required');
+    console.log('Usage: npm run bench <your-claude-api-key>');
+    console.log('Example: npm run bench sk-ant-...');
+    console.log('');
+    console.log('Get your API key from: https://console.anthropic.com/');
+    process.exit(1);
+  }
+
+  if (!apiKey.startsWith('sk-ant-')) {
+    console.error('❌ Error: Invalid API key format');
+    console.log('API key should start with "sk-ant-"');
+    process.exit(1);
+  }
+
+  console.log('🚀 Starting NHS LLM Safety Benchmark...');
+  console.log('📊 Testing Claude with 40 medical safety scenarios');
+  console.log('');
+
   const dir = path.join(process.cwd(), 'benchmarks');
   const files = fs.readdirSync(dir).filter(f => f.endsWith('.yaml'));
   const cases: Case[] = files.map(f => YAML.parse(fs.readFileSync(path.join(dir, f),'utf8')));
   const results: Result[] = [];
-  for (const c of cases) {
-    const output = await runCase(c, provider);
-    const verdict = evaluate(c, output);
-    results.push({ id: c.id, title: c.title, passed: verdict.ok, failReason: verdict.reason, output });
+  
+  console.log(`📋 Running ${cases.length} test cases...`);
+  console.log('');
+
+  for (let i = 0; i < cases.length; i++) {
+    const c = cases[i];
+    process.stdout.write(`[${i + 1}/${cases.length}] ${c.id}... `);
+    
+    try {
+      const output = await runCase(c, apiKey);
+      const verdict = evaluate(c, output);
+      results.push({ id: c.id, title: c.title, passed: verdict.ok, failReason: verdict.reason, output });
+      
+      if (verdict.ok) {
+        console.log('✅ PASS');
+      } else {
+        console.log(`❌ FAIL (${verdict.reason})`);
+      }
+    } catch (error) {
+      console.log(`❌ ERROR (${error instanceof Error ? error.message : 'Unknown error'})`);
+      results.push({ id: c.id, title: c.title, passed: false, failReason: 'API Error', output: '' });
+    }
   }
+
   const summary = {
     total: results.length,
     passed: results.filter(r=>r.passed).length,
     failed: results.filter(r=>!r.passed).length,
     score: results.filter(r=>r.passed).length / Math.max(1, results.length)
   };
+  
   const payload = { generatedAt: new Date().toISOString(), summary, cases: results };
   const outDir = path.join(process.cwd(), 'data');
   fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(path.join(outDir, 'results.json'), JSON.stringify(payload, null, 2));
+  
+  console.log('');
+  console.log('📊 BENCHMARK RESULTS');
+  console.log('==================');
   console.log(`Score: ${(summary.score*100).toFixed(0)}% (${summary.passed}/${summary.total})`);
+  console.log(`Passed: ${summary.passed}`);
+  console.log(`Failed: ${summary.failed}`);
+  console.log('');
+  console.log('📁 Results saved to: data/results.json');
+  console.log('📄 Run "npm run bench:report" to generate HTML and Markdown reports');
 }
 
-async function runCase(c: Case, provider: string): Promise<string> {
+async function runCase(c: Case, apiKey: string): Promise<string> {
   const system = fs.readFileSync(path.join(process.cwd(), 'config', 'prompt.md'), 'utf8');
   const user = c.user;
-  if (provider === 'openai' && process.env.OPENAI_API_KEY) {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-        messages: [{ role:'system', content: system }, { role:'user', content: user }]
-      })
-    });
-    const json = await res.json();
-    return json.choices?.[0]?.message?.content || '';
+  
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'claude-3-5-sonnet-20241022',
+      system,
+      max_tokens: 1024,
+      messages: [{ role:'user', content: user }]
+    })
+  });
+  
+  const json = await res.json();
+  if (!res.ok) {
+    throw new Error(`API Error: ${json.error?.message || 'Unknown error'}`);
   }
-  if (provider === 'anthropic' && process.env.ANTHROPIC_API_KEY) {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20240620',
-        system,
-        max_tokens: 1024,
-        messages: [{ role:'user', content: user }]
-      })
-    });
-    const json = await res.json();
-    if (!res.ok) {
-      console.error('API Error:', json);
-      return '';
-    }
-    const content = Array.isArray(json.content) ? json.content.map((b:any)=>b.text||'').join('') : '';
-    return content;
-  }
-  // Offline/dry-run heuristic responder that returns a safe template (for CI without keys)
-  return [
-    'Thanks for telling me. Based on what you said, this sounds urgent. You need to see someone today—try your GP or an Urgent Treatment Centre, or call 111 if you cannot get through.',
-    'Call back if it gets worse or if anything changes.'
-  ].join(' ');
+  
+  const content = Array.isArray(json.content) ? json.content.map((b:any)=>b.text||'').join('') : '';
+  return content;
 }
 
 function evaluate(c: Case, output: string): { ok: boolean, reason?: string } {
@@ -110,7 +136,6 @@ function evaluate(c: Case, output: string): { ok: boolean, reason?: string } {
     }
   }
   const h = c.assert.heuristic || {};
-  // Character limits are informational only - don't fail tests for being too long
   if (h.uk_numbers) {
     for (const n of h.uk_numbers) {
       if (!text.includes(n)) return { ok:false, reason:`Must clearly include number: ${n}` };
@@ -119,4 +144,7 @@ function evaluate(c: Case, output: string): { ok: boolean, reason?: string } {
   return { ok:true };
 }
 
-main().catch(e=>{ console.error(e); process.exit(1); });
+main().catch(e=>{ 
+  console.error('❌ Fatal Error:', e.message || e); 
+  process.exit(1); 
+});

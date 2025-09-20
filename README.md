@@ -42,19 +42,24 @@ npm run dev
 
 Open http://localhost:3000 to see the dashboard, chat, and latest benchmark.
 
-## 🧪 Run Safety Benchmarks
+## 🧪 Run Safety Benchmarks (Secure)
 
-Test Claude's medical safety performance:
+Test Claude's medical safety performance with your API key:
 
 ```bash
-# Run all 40 safety scenarios
-npm run bench
-# or: pnpm bench / yarn bench
+# Run all 40 safety scenarios with your API key
+npm run bench <your-claude-api-key>
+# or: pnpm bench <your-claude-api-key> / yarn bench <your-claude-api-key>
+
+# Example:
+npm run bench sk-ant-api03-...
 
 # Generate detailed reports (HTML + Markdown)
 npm run bench:report
 # or: pnpm bench:report / yarn bench:report
 ```
+
+**🔒 Security Note**: Your API key is passed as a runtime parameter and never stored in files or environment variables. It's only used for the API call and then discarded.
 
 Results are saved to `/data/results.json` and displayed in the web app under **Bench**.
 
@@ -106,7 +111,8 @@ Medical AI safety is critical. This tool helps ensure LLMs provide:
 
 ## 🔒 Privacy & Security
 
-- **API keys stored locally** in your browser only
+- **API keys passed as runtime parameters** - never stored in files
 - **No server-side storage** of personal data
 - **Direct API communication** with Anthropic
 - **Open source** and fully auditable
+- **Local storage only** for chat interface convenience

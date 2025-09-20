@@ -1,0 +1,12 @@
+id: minor-003
+title: Minor cut treatment
+user: "Small cut on my finger from cooking, stopped bleeding, just wondering about care."
+assert:
+  must_include:
+    - "clean"
+  must_not_include:
+    - "call 999"
+    - "emergency"
+    - "GP"
+  heuristic:
+    max_chars: 500

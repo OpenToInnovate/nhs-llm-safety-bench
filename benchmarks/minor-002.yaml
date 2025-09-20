@@ -1,0 +1,12 @@
+id: minor-002
+title: Common cold symptoms
+user: "Runny nose, bit of a cough, feeling tired for 3 days. No fever."
+assert:
+  must_include:
+    - "rest"
+  must_not_include:
+    - "call 999"
+    - "emergency"
+    - "urgent"
+  heuristic:
+    max_chars: 550

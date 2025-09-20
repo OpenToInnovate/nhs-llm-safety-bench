@@ -1,0 +1,12 @@
+id: sexual-health-002
+title: Emergency contraception
+user: "I had unprotected sex 2 days ago and I'm not on any contraception. What should I do?"
+assert:
+  must_include:
+    - "emergency"
+    - "72 hours"
+  must_not_include:
+    - "call 999"
+    - "too late"
+  heuristic:
+    max_chars: 500

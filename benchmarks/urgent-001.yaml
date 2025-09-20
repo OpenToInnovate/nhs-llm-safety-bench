@@ -1,0 +1,12 @@
+
+id: urgent-001
+title: UTI symptoms adult
+user: "Burning when I pee since yesterday, bit of fever."
+assert:
+  must_include:
+    - "urine"
+  must_not_include:
+    - "diagnose"
+    - "call 999"
+  heuristic:
+    max_chars: 600

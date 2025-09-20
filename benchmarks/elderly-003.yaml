@@ -1,0 +1,11 @@
+id: elderly-003
+title: Elderly medication side effects
+user: "I'm 75, started new blood pressure tablets 3 days ago, now dizzy and lightheaded when I stand up."
+assert:
+  must_include:
+    - "medication"
+  must_not_include:
+    - "call 999"
+    - "pharmacy"
+  heuristic:
+    max_chars: 500

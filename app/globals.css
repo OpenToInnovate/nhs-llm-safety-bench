@@ -1,13 +1,296 @@
 
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-a{color:#0b57d0;text-decoration:none}
-a:hover{text-decoration:underline}
-.container{max-width:72rem;margin:0 auto;padding:1rem}
-.card{background:#fff;border:1px solid #e5e7eb;border-radius:1rem;box-shadow:0 1px 2px rgba(0,0,0,.04);padding:1rem}
-.btn{display:inline-flex;align-items:center;gap:.5rem;border:1px solid #e5e7eb;background:#0b57d0;color:#fff;border-radius:.75rem;padding:.5rem .9rem;cursor:pointer}
-.btn.secondary{background:#fff;color:#0b57d0}
-.input{width:100%;border:1px solid #e5e7eb;border-radius:.75rem;padding:.6rem .8rem}
-textarea.input{min-height:8rem}
-pre{white-space:pre-wrap;word-wrap:break-word}
+/* NHS LLM Safety Bench - GOV.UK Inspired Design System */
+
+/* Reset and Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: "GDS Transport", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #0b0c0c;
+  background-color: #f8f8f8;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "GDS Transport", Arial, sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 1rem 0;
+  color: #0b0c0c;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid #1d70b8;
+  padding-bottom: 0.5rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+p {
+  margin: 0 0 1rem 0;
+  line-height: 1.6;
+}
+
+/* Links */
+a {
+  color: #1d70b8;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: #003078;
+  text-decoration-thickness: 3px;
+}
+
+a:focus {
+  outline: 3px solid #ffdd00;
+  outline-offset: 2px;
+  background-color: #ffdd00;
+  color: #0b0c0c;
+}
+
+/* Layout */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Cards and Panels */
+.card {
+  background: #ffffff;
+  border: 1px solid #b1b4b6;
+  border-radius: 0;
+  box-shadow: 0 2px 0 0 #0b0c0c;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.card h2, .card h3 {
+  margin-top: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 2px solid #0b0c0c;
+  background: #0b0c0c;
+  color: #ffffff;
+  border-radius: 0;
+  padding: 0.75rem 1.5rem;
+  font-family: "GDS Transport", Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.btn:hover {
+  background: #3d3d3d;
+  border-color: #3d3d3d;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.btn:focus {
+  outline: 3px solid #ffdd00;
+  outline-offset: 2px;
+  background: #ffdd00;
+  color: #0b0c0c;
+  border-color: #0b0c0c;
+}
+
+.btn.secondary {
+  background: #ffffff;
+  color: #0b0c0c;
+  border-color: #0b0c0c;
+}
+
+.btn.secondary:hover {
+  background: #f3f2f1;
+  border-color: #0b0c0c;
+  color: #0b0c0c;
+}
+
+.btn:disabled {
+  background: #b1b4b6;
+  border-color: #b1b4b6;
+  color: #ffffff;
+  cursor: not-allowed;
+}
+
+/* Form Elements */
+.input {
+  width: 100%;
+  border: 2px solid #0b0c0c;
+  border-radius: 0;
+  padding: 0.75rem;
+  font-family: "GDS Transport", Arial, sans-serif;
+  font-size: 1rem;
+  background: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.input:focus {
+  outline: 3px solid #ffdd00;
+  outline-offset: 2px;
+  border-color: #0b0c0c;
+}
+
+textarea.input {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+}
+
+th, td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #b1b4b6;
+}
+
+th {
+  background: #f3f2f1;
+  font-weight: 600;
+  border-bottom: 2px solid #0b0c0c;
+}
+
+tr:hover {
+  background: #f8f8f8;
+}
+
+/* Code */
+code, pre {
+  font-family: "GDS Transport", Arial, sans-serif;
+  font-size: 0.9rem;
+  background: #f3f2f1;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  padding: 1rem;
+  background: #f3f2f1;
+  border: 1px solid #b1b4b6;
+  overflow-x: auto;
+}
+
+/* Status Indicators */
+.status-pass {
+  color: #00703c;
+  font-weight: 600;
+}
+
+.status-fail {
+  color: #d4351c;
+  font-weight: 600;
+}
+
+/* Grid Layout */
+.grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.grid-cols-1 {
+  grid-template-columns: 1fr;
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 768px) {
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .container {
+    padding: 0 0.5rem;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+
+/* Focus Management */
+*:focus {
+  outline: 3px solid #ffdd00;
+  outline-offset: 2px;
+}
+
+/* Skip Link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #0b0c0c;
+  color: #ffffff;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 6px;
+}

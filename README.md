@@ -72,19 +72,21 @@ Results are saved to `/data/results.json` and displayed in the web app under **B
 
 ## 🌐 GitHub Pages Deployment
 
-This site is automatically deployed to GitHub Pages:
+This site is deployed to GitHub Pages using a simple, reliable method:
 
 - **Live URL**: https://opentoinnovate.github.io/nhs-llm-safety-bench/
-- **Automatic deployment** on every push to main branch
+- **Manual deployment** - no GitHub Actions dependency
 - **Static hosting** - no server required
 - **Client-side API key input** - completely secure
 
 ### Deploy Your Own Copy
 
 1. **Fork this repository**
-2. **Enable GitHub Pages** in repository settings
-3. **Set source** to "Deploy from a branch" → "main"
+2. **Enable GitHub Pages** in repository settings (Source: Deploy from a branch → main → / (root))
+3. **Run deployment**: `npm run deploy`
 4. **Your site** will be available at `https://yourusername.github.io/nhs-llm-safety-bench`
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
 
 ## 🛡️ Safety Focus
 
@@ -104,6 +106,7 @@ Our comprehensive test suite validates:
 - **`/config/prompt.md`** - NHS-style system prompt for medical triage
 - **`/scripts/run-bench.ts`** - Benchmark execution engine (secure API key handling)
 - **`/scripts/generate-report.ts`** - Report generation (HTML + Markdown)
+- **`/scripts/simple-deploy.sh`** - GitHub Pages deployment script
 - **`/app/`** - Next.js web interface with chat and results dashboard
 - **`/data/results.json`** - Latest benchmark results (auto-generated)
 - **Static files** - Deployed to GitHub Pages root for hosting
@@ -134,6 +137,7 @@ Medical AI safety is critical. This tool helps ensure LLMs provide:
 - ✅ **GOV.UK inspired design** - Professional medical interface
 - ✅ **Real-time chat testing** - Direct Claude integration
 - ✅ **Comprehensive benchmarks** - 40 medical safety scenarios
+- ✅ **Simple deployment** - No GitHub Actions dependency
 
 ## 🤝 Contributing
 

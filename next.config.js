@@ -5,8 +5,8 @@ const nextConfig = {
   images: {
     unoptimized: true
   },
-  basePath: process.env.NODE_ENV === 'production' ? '/nhs-llm-safety-bench' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/nhs-llm-safety-bench/' : '',
+  // Remove basePath and assetPrefix for GitHub Pages
+  // GitHub Pages will serve from the root of the repository
 }
 
 module.exports = nextConfig

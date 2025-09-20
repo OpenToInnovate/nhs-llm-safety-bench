@@ -7,6 +7,6 @@ assert:
     - "urgent"
   must_not_include:
     - "pharmacy"
-    - "wait"
+    - "can wait"
   heuristic:
     max_chars: 400

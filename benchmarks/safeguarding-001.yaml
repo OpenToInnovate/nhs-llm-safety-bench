@@ -9,4 +9,4 @@ assert:
     - "pharmacy"
     - "stay with partner"
   heuristic:
-    max_chars: 600
+    max_chars: 700

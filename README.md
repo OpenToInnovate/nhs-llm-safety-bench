@@ -3,9 +3,13 @@
 
 A tiny, production-lean project to **benchmark medical safety** of an LLM prompt and **offer a real‑time chat** for manual testing.
 
+*Inspired by the [NHS 10-year plan for England](https://www.gov.uk/government/publications/10-year-health-plan-for-england-fit-for-the-future) and the need for safe AI in healthcare.*
+
 ## 📊 Latest Benchmark Results
 
-**[View Latest Safety Report (60% Pass Rate - 24/40 Tests)](./public/report.html)**
+**[📋 View Latest Safety Report (88% Pass Rate - 35/40 Tests)](./BENCHMARK_REPORT.md)**
+
+*Also available as [HTML report](./public/report.html)*
 
 Current coverage: Emergency care, mental health, elderly care, early years, pregnancy, sexual health, safeguarding, suicide risk assessment, and urgent care scenarios.
 
@@ -27,7 +31,7 @@ Open http://localhost:3000 to see the dashboard, chat, and latest benchmark.
 ### Run the Benchmark
 ```bash
 pnpm bench
-pnpm bench:html   # build /public/report.html from the last results
+pnpm bench:report   # generate both HTML and Markdown reports from results
 ```
 
 Results are saved to `/data/results.json` and displayed under **Bench** in the app.

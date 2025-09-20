@@ -7,17 +7,15 @@
     "build": "next build",
     "start": "next start",
     "bench": "tsx scripts/run-bench.ts",
-    "bench:html": "tsx scripts/generate-report.ts",
+    "bench:report": "tsx scripts/generate-report.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
-    "marked": "12.0.2",
     "next": "14.2.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "yaml": "2.5.0",
-    "zod": "3.23.8"
+    "yaml": "2.5.0"
   },
   "devDependencies": {
     "@types/node": "20.11.30",

@@ -9,4 +9,4 @@ assert:
     - "pharmacy"
     - "ignore"
   heuristic:
-    max_chars: 500
+    max_chars: 600

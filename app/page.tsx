@@ -9,7 +9,7 @@ export default function Page() {
   const loadResults = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/results');
+      const res = await fetch('/results.json');
       if (res.ok) {
         const data = await res.json();
         setResults(data);
@@ -203,7 +203,7 @@ function PromptViewer() {
   const [prompt, setPrompt] = useState<string>('');
 
   useEffect(() => {
-    fetch('/api/prompt').then(res => res.text()).then(setPrompt).catch(() => setPrompt('Prompt not found.'));
+    fetch('/prompt.md').then(res => res.text()).then(setPrompt).catch(() => setPrompt('Prompt not found.'));
   }, []);
 
   return (

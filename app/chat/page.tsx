@@ -45,18 +45,35 @@ export default function ChatPage() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/chat', { 
-        method: 'POST', 
-        body: JSON.stringify({ 
-          messages: [...messages, userMsg],
-          apiKey: apiKey
-        }), 
-        headers: {'content-type':'application/json'} 
+      // Get system prompt
+      const promptRes = await fetch('/prompt.md');
+      const systemPrompt = promptRes.ok ? await promptRes.text() : 'You are a helpful medical assistant.';
+      
+      // Prepare messages for Claude API
+      const claudeMessages = [...messages, userMsg].map(m => ({
+        role: m.role,
+        content: m.content
+      }));
+      
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'claude-3-5-sonnet-20241022',
+          system: systemPrompt,
+          max_tokens: 4096,
+          stream: true,
+          messages: claudeMessages
+        })
       });
       
       if (!res.ok) {
-        const errorText = await res.text();
-        setError(`API Error: ${errorText}`);
+        const errorData = await res.json().catch(() => ({ error: { message: 'Unknown error' } }));
+        setError(`API Error: ${errorData.error?.message || 'Request failed'}`);
         setLoading(false);
         return;
       }
@@ -71,15 +88,33 @@ export default function ChatPage() {
       let assistant = '';
       setMessages(m => [...m, { role: 'assistant', content: '' }]);
       
+      const decoder = new TextDecoder();
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        assistant += new TextDecoder().decode(value);
-        setMessages(m => {
-          const copy = [...m];
-          copy[copy.length-1] = { role: 'assistant', content: assistant };
-          return copy;
-        });
+        
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n').filter(Boolean);
+        
+        for (const line of lines) {
+          if (!line.startsWith('data:')) continue;
+          const payload = line.slice(5).trim();
+          if (payload === '[DONE]') continue;
+          
+          try {
+            const evt = JSON.parse(payload);
+            if (evt.type === 'content_block_delta' && evt.delta?.text) {
+              assistant += evt.delta.text;
+              setMessages(m => {
+                const copy = [...m];
+                copy[copy.length-1] = { role: 'assistant', content: assistant };
+                return copy;
+              });
+            }
+          } catch (e) {
+            // Ignore parsing errors
+          }
+        }
       }
     } catch (err) {
       setError(`Network error: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -316,7 +351,7 @@ export default function ChatPage() {
               This chat uses the same NHS-style medical triage prompt as our safety benchmarks.
             </p>
             <a 
-              href="/api/prompt" 
+              href="/prompt.md" 
               target="_blank" 
               rel="noreferrer"
               className="btn secondary"

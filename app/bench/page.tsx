@@ -1,19 +1,28 @@
 
-import fs from 'node:fs';
-import path from 'node:path';
-
-function readLastBench() {
-  try {
-    const p = path.join(process.cwd(), 'data', 'results.json');
-    const raw = fs.readFileSync(p, 'utf8');
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
+'use client';
+import { useEffect, useState } from 'react';
 
 export default function BenchPage(){
-  const results = readLastBench();
+  const [results, setResults] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadResults = async () => {
+      try {
+        const res = await fetch('/results.json');
+        if (res.ok) {
+          const data = await res.json();
+          setResults(data);
+        } else {
+          setResults(null);
+        }
+      } catch {
+        setResults(null);
+      }
+      setLoading(false);
+    };
+    loadResults();
+  }, []);
   
   return (
     <div>
@@ -25,7 +34,12 @@ export default function BenchPage(){
         </p>
       </div>
 
-      {!results ? (
+      {loading ? (
+        <div className="card">
+          <h2>Loading Results...</h2>
+          <p>Please wait while we load the benchmark results.</p>
+        </div>
+      ) : !results ? (
         <div className="card">
           <h2>No Results Found</h2>
           <p>No benchmark results are available. To run the safety tests:</p>

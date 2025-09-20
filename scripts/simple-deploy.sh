@@ -11,6 +11,10 @@ npm run build
 echo "📁 Copying static files to root..."
 cp -r out/* .
 
+echo "📄 Copying data files to public..."
+cp data/results.json public/results.json
+cp config/prompt.md public/prompt.md
+
 # Add all files
 echo "📝 Adding files to git..."
 git add .

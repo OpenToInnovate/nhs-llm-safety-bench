@@ -33,13 +33,18 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Copy static files to root
+        run: |
+          cp -r out/* .
+          echo "Static files copied to root directory"
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./out
+          path: ./
 
   deploy:
     environment:

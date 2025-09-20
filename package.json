@@ -9,6 +9,7 @@
     "export": "next build && next export",
     "bench": "tsx scripts/run-bench.ts",
     "bench:report": "tsx scripts/generate-report.ts",
+    "deploy": "./scripts/simple-deploy.sh",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

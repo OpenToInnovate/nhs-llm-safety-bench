@@ -1,52 +1,97 @@
-
 'use client';
 import { useEffect, useRef, useState } from 'react';
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<{role:'user'|'assistant', content:string}[]>([]);
   const [input, setInput] = useState('');
-  const [provider, setProvider] = useState<string>('iframe');
-  const [iframeUrl, setIframeUrl] = useState<string>('');
+  const [apiKey, setApiKey] = useState<string>('');
+  const [apiKeyValid, setApiKeyValid] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [showApiKeyInput, setShowApiKeyInput] = useState<boolean>(false);
   const streamRef = useRef<EventSource|null>(null);
 
+  // Load API key from localStorage on mount
   useEffect(() => {
-    fetch('/api/info').then(r=>r.json()).then(info => {
-      setProvider(info.provider);
-      setIframeUrl(info.iframeUrl || '');
-    });
-    return () => {
-      streamRef.current?.close();
-    };
+    const savedKey = localStorage.getItem('claude-api-key');
+    if (savedKey) {
+      setApiKey(savedKey);
+      setApiKeyValid(true);
+    }
   }, []);
 
+  // Save API key to localStorage when it changes
+  useEffect(() => {
+    if (apiKey && apiKey.startsWith('sk-ant-')) {
+      localStorage.setItem('claude-api-key', apiKey);
+      setApiKeyValid(true);
+      setError('');
+    } else if (apiKey) {
+      setApiKeyValid(false);
+      setError('API key should start with "sk-ant-"');
+    } else {
+      setApiKeyValid(false);
+      setError('');
+    }
+  }, [apiKey]);
+
   async function send() {
-    if (!input.trim()) return;
+    if (!input.trim() || !apiKeyValid) return;
+    
     const userMsg = { role: 'user' as const, content: input.trim() };
     setMessages(m => [...m, userMsg]);
     setInput('');
-    if (provider === 'iframe') return; // manual testing in iframe
+    setError('');
 
     setLoading(true);
-    const res = await fetch('/api/chat', { method: 'POST', body: JSON.stringify({ messages: [...messages, userMsg] }), headers:{'content-type':'application/json'} });
-    if (!res.body) {
-      setLoading(false);
-      return;
-    }
-    const reader = res.body.getReader();
-    let assistant = '';
-    setMessages(m => [...m, { role: 'assistant', content: '' }]);
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      assistant += new TextDecoder().decode(value);
-      setMessages(m => {
-        const copy = [...m];
-        copy[copy.length-1] = { role: 'assistant', content: assistant };
-        return copy;
+    try {
+      const res = await fetch('/api/chat', { 
+        method: 'POST', 
+        body: JSON.stringify({ 
+          messages: [...messages, userMsg],
+          apiKey: apiKey
+        }), 
+        headers: {'content-type':'application/json'} 
       });
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        setError(`API Error: ${errorText}`);
+        setLoading(false);
+        return;
+      }
+      
+      if (!res.body) {
+        setError('No response body received');
+        setLoading(false);
+        return;
+      }
+      
+      const reader = res.body.getReader();
+      let assistant = '';
+      setMessages(m => [...m, { role: 'assistant', content: '' }]);
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        assistant += new TextDecoder().decode(value);
+        setMessages(m => {
+          const copy = [...m];
+          copy[copy.length-1] = { role: 'assistant', content: assistant };
+          return copy;
+        });
+      }
+    } catch (err) {
+      setError(`Network error: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
     setLoading(false);
+  }
+
+  function clearApiKey() {
+    setApiKey('');
+    localStorage.removeItem('claude-api-key');
+    setApiKeyValid(false);
+    setError('');
   }
 
   return (
@@ -63,6 +108,98 @@ export default function ChatPage() {
         {/* Main Chat Interface */}
         <div className="card">
           <h2>Streaming Chat Interface</h2>
+          
+          {/* API Key Section */}
+          <div style={{ 
+            backgroundColor: '#f3f2f1', 
+            padding: '1rem', 
+            border: '1px solid #b1b4b6',
+            marginBottom: '1.5rem',
+            borderRadius: '0'
+          }}>
+            <h3 style={{ fontSize: '1.1rem', margin: '0 0 0.75rem 0' }}>Claude API Configuration</h3>
+            
+            {!apiKeyValid ? (
+              <div>
+                <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.9rem' }}>
+                  Enter your Claude API key to start testing. Get your key from the{' '}
+                  <a 
+                    href="https://console.anthropic.com/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{ color: '#1d70b8' }}
+                  >
+                    Anthropic Console
+                  </a>.
+                </p>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                  <input 
+                    type="password"
+                    className="input" 
+                    placeholder="sk-ant-..." 
+                    value={apiKey} 
+                    onChange={e => setApiKey(e.target.value)}
+                    style={{ marginBottom: 0, flex: 1 }}
+                  />
+                  <button 
+                    className="btn" 
+                    onClick={() => setShowApiKeyInput(!showApiKeyInput)}
+                    style={{ whiteSpace: 'nowrap' }}
+                  >
+                    {showApiKeyInput ? 'Hide' : 'Show'} Key
+                  </button>
+                </div>
+                {showApiKeyInput && (
+                  <input 
+                    type="text"
+                    className="input" 
+                    placeholder="sk-ant-..." 
+                    value={apiKey} 
+                    onChange={e => setApiKey(e.target.value)}
+                    style={{ marginTop: '0.5rem', marginBottom: 0 }}
+                  />
+                )}
+              </div>
+            ) : (
+              <div>
+                <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.9rem', color: '#00703c' }}>
+                  ✅ API key configured and ready
+                </p>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                  <code style={{ 
+                    backgroundColor: '#ffffff', 
+                    padding: '0.25rem 0.5rem',
+                    border: '1px solid #b1b4b6',
+                    fontSize: '0.8rem',
+                    flex: 1
+                  }}>
+                    {apiKey.substring(0, 12)}...{apiKey.substring(apiKey.length - 8)}
+                  </code>
+                  <button 
+                    className="btn secondary" 
+                    onClick={clearApiKey}
+                    style={{ fontSize: '0.8rem' }}
+                  >
+                    Change Key
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            {error && (
+              <div style={{ 
+                backgroundColor: '#f8d7da', 
+                color: '#721c24',
+                padding: '0.75rem',
+                border: '1px solid #f5c6cb',
+                marginTop: '0.75rem',
+                fontSize: '0.9rem'
+              }}>
+                {error}
+              </div>
+            )}
+          </div>
+
           <p style={{ marginBottom: '1.5rem' }}>
             This chat interface uses the same system prompt as our safety benchmarks. 
             Test medical scenarios and see how Claude responds in real-time.
@@ -86,7 +223,7 @@ export default function ChatPage() {
               }}>
                 <p style={{ margin: 0, fontSize: '1.1rem' }}>No messages yet</p>
                 <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem' }}>
-                  Start a conversation to test the medical safety prompt
+                  {apiKeyValid ? 'Start a conversation to test the medical safety prompt' : 'Configure your API key above to start testing'}
                 </p>
               </div>
             ) : (
@@ -131,17 +268,18 @@ export default function ChatPage() {
                 }
               }}
               style={{ marginBottom: 0 }}
+              disabled={!apiKeyValid}
             />
             <button 
               className="btn" 
               onClick={send} 
-              disabled={loading || provider === 'iframe'}
+              disabled={loading || !apiKeyValid}
             >
               {loading ? 'Streaming…' : 'Send'}
             </button>
           </div>
 
-          {provider === 'iframe' && (
+          {!apiKeyValid && (
             <div style={{ 
               backgroundColor: '#fff3cd', 
               border: '1px solid #ffc107',
@@ -149,8 +287,7 @@ export default function ChatPage() {
               borderRadius: '0'
             }}>
               <p style={{ margin: 0, fontSize: '0.9rem' }}>
-                <strong>Provider set to iframe.</strong> Use the embedded chat below for manual testing, 
-                or configure Claude API key in your <code>.env</code> file.
+                <strong>API key required.</strong> Enter your Claude API key above to start testing the medical safety prompt.
               </p>
             </div>
           )}
@@ -160,15 +297,16 @@ export default function ChatPage() {
         <div className="card">
           <h2>Configuration</h2>
           <div style={{ marginBottom: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Current Provider</h3>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>API Status</h3>
             <div style={{ 
-              backgroundColor: '#f3f2f1', 
+              backgroundColor: apiKeyValid ? '#d4edda' : '#f8d7da', 
               padding: '0.75rem',
-              border: '1px solid #b1b4b6',
+              border: `1px solid ${apiKeyValid ? '#c3e6cb' : '#f5c6cb'}`,
               borderRadius: '0',
-              fontFamily: 'monospace'
+              fontFamily: 'monospace',
+              fontSize: '0.9rem'
             }}>
-              {provider}
+              {apiKeyValid ? '✅ Claude API Ready' : '❌ API Key Required'}
             </div>
           </div>
 
@@ -212,47 +350,6 @@ export default function ChatPage() {
           </div>
         </div>
       </div>
-
-      {/* Embedded Chat Section */}
-      {iframeUrl && (
-        <div className="card" style={{ marginTop: '2rem' }}>
-          <h2>Embedded Chat Interface</h2>
-          <p style={{ marginBottom: '1rem' }}>
-            Alternative chat interface for manual testing and comparison.
-          </p>
-          <IFramePane url={iframeUrl} />
-        </div>
-      )}
     </div>
-  );
-}
-
-function IFramePane({ url }: {url: string}) {
-  if (!url) {
-    return (
-      <div style={{ 
-        backgroundColor: '#f3f2f1', 
-        padding: '2rem',
-        textAlign: 'center',
-        border: '1px solid #b1b4b6'
-      }}>
-        <p style={{ margin: 0 }}>
-          Set <code>IFRAME_URL</code> in your <code>.env</code> file to embed a free chat interface.
-        </p>
-      </div>
-    );
-  }
-  
-  return (
-    <iframe 
-      src={url} 
-      style={{ 
-        width: '100%', 
-        height: '600px', 
-        border: '2px solid #0b0c0c',
-        borderRadius: '0'
-      }} 
-      title="Embedded Chat Interface"
-    />
   );
 }

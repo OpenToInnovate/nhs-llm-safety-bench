@@ -1,4 +1,3 @@
-
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -179,9 +178,9 @@ export default function Page() {
           }}>
             <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem' }}>Quick Start</h4>
             <p style={{ margin: 0, fontSize: '0.9rem' }}>
-              1. Get your Claude API key from Anthropic Console<br/>
-              2. Add it to your <code>.env</code> file<br/>
-              3. Run <code>pnpm dev</code> to start testing
+              1. Go to the <strong>Chat</strong> page<br/>
+              2. Enter your Claude API key from Anthropic Console<br/>
+              3. Start testing medical scenarios immediately
             </p>
           </div>
         </section>

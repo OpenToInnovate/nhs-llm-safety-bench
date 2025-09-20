@@ -1,7 +1,6 @@
-
 # NHS LLM Safety Bench
 
-A production-ready project to **benchmark medical safety** of LLM responses and **offer real-time chat** for manual testing.
+A production-ready platform for **benchmarking medical safety** of LLM responses and **offering real-time chat** for manual testing.
 
 *Inspired by the [NHS 10-year plan for England](https://www.gov.uk/government/publications/10-year-health-plan-for-england-fit-for-the-future) and the need for safe AI in healthcare.*
 
@@ -23,39 +22,22 @@ A production-ready project to **benchmark medical safety** of LLM responses and 
 
 Current coverage: Emergency care, mental health, elderly care, early years, pregnancy, sexual health, safeguarding, suicide risk assessment, and urgent care scenarios.
 
-## 🚀 Quick Start (Claude Setup)
+## 🚀 Quick Start (Static Hosting Ready)
 
-### 1. Install Dependencies
+### Option 1: Use the Live Demo
+1. Visit the [Live Chat Testing](/chat) page
+2. Enter your Claude API key from [Anthropic Console](https://console.anthropic.com/)
+3. Start testing medical scenarios immediately
+
+### Option 2: Run Locally
 ```bash
-pnpm install
-# or: npm install / yarn install
-```
+# Install dependencies
+npm install
+# or: pnpm install / yarn install
 
-### 2. Get Your Claude API Key
-1. Go to [Anthropic Console](https://console.anthropic.com/)
-2. Sign up/login and navigate to API Keys
-3. Create a new API key
-4. Copy the key (starts with `sk-ant-...`)
-
-### 3. Configure Environment
-Create a `.env` file in the project root:
-
-```bash
-# Create the environment file
-touch .env
-```
-
-Add your Claude configuration to `.env`:
-```env
-MODEL_PROVIDER=anthropic
-ANTHROPIC_API_KEY=your_actual_api_key_here
-```
-
-**⚠️ Important**: Replace `your_actual_api_key_here` with your real API key from step 2.
-
-### 4. Run the Application
-```bash
-pnpm dev
+# Start development server
+npm run dev
+# or: pnpm dev / yarn dev
 ```
 
 Open http://localhost:3000 to see the dashboard, chat, and latest benchmark.
@@ -66,13 +48,31 @@ Test Claude's medical safety performance:
 
 ```bash
 # Run all 40 safety scenarios
-pnpm bench
+npm run bench
+# or: pnpm bench / yarn bench
 
 # Generate detailed reports (HTML + Markdown)
-pnpm bench:report
+npm run bench:report
+# or: pnpm bench:report / yarn bench:report
 ```
 
 Results are saved to `/data/results.json` and displayed in the web app under **Bench**.
+
+## 🌐 Static Hosting (GitHub Pages Ready)
+
+This site is designed to be completely static and hostable on GitHub Pages:
+
+- **No server-side environment variables** required
+- **API key input** directly in the chat interface
+- **Client-side only** configuration
+- **GitHub Pages compatible** out of the box
+
+### Deploy to GitHub Pages
+
+1. Fork this repository
+2. Enable GitHub Pages in repository settings
+3. Set source to "Deploy from a branch" → "main"
+4. The site will be available at `https://yourusername.github.io/nhs-llm-safety-bench`
 
 ## 🛡️ Safety Focus
 
@@ -103,3 +103,10 @@ Medical AI safety is critical. This tool helps ensure LLMs provide:
 - **UK-specific pathways** and contact information
 - **Safeguarding awareness** for vulnerable patients
 - **Clear communication** that doesn't overstep medical boundaries
+
+## 🔒 Privacy & Security
+
+- **API keys stored locally** in your browser only
+- **No server-side storage** of personal data
+- **Direct API communication** with Anthropic
+- **Open source** and fully auditable

@@ -46,25 +46,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </p>
               </div>
               <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-                <Link href="/" style={{ 
+                <Link href="/chat" style={{ 
                   color: '#ffffff', 
                   textDecoration: 'none',
                   fontWeight: '600',
                   padding: '0.5rem 0',
-                  borderBottom: '2px solid transparent',
+                  borderBottom: '2px solid #ffdd00',
                   transition: 'border-color 0.2s ease'
                 }}>
-                  Dashboard
-                </Link>
-                <Link href="/chat" style={{ 
-                  color: '#ffffff', 
-                  textDecoration: 'none',
-                  fontWeight: '400',
-                  padding: '0.5rem 0',
-                  borderBottom: '2px solid transparent',
-                  transition: 'border-color 0.2s ease'
-                }}>
-                  Chat
+                  Live Chat
                 </Link>
                 <Link href="/bench" style={{ 
                   color: '#ffffff', 
@@ -74,8 +64,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   borderBottom: '2px solid transparent',
                   transition: 'border-color 0.2s ease'
                 }}>
-                  Bench
+                  Benchmark Results
                 </Link>
+                <a 
+                  href="https://github.com/OpenToInnovate/nhs-llm-safety-bench" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ 
+                    color: '#ffffff', 
+                    textDecoration: 'none',
+                    fontWeight: '400',
+                    padding: '0.5rem 0',
+                    borderBottom: '2px solid transparent',
+                    transition: 'border-color 0.2s ease'
+                  }}
+                >
+                  GitHub
+                </a>
               </nav>
             </div>
           </div>

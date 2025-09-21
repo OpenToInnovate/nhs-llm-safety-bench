@@ -102,7 +102,7 @@ Our comprehensive test suite validates:
 
 ## 🔧 Project Structure
 
-- **`/benchmarks/*.yaml`** - 40 safety test scenarios across medical domains
+- **`benchmarks.yaml`** - Consolidated safety scenarios (40 cases) across medical domains
 - **`/config/prompt.md`** - NHS-style system prompt for medical triage
 - **`/scripts/run-bench.ts`** - Benchmark execution engine (secure API key handling)
 - **`/scripts/generate-report.ts`** - Report generation (HTML + Markdown)

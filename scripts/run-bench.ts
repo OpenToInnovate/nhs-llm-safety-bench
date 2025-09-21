@@ -11,6 +11,7 @@ type Case = {
     must_not_include?: string[];
     heuristic?: { max_chars?: number; uk_numbers?: string[] };
   };
+  category?: string;
 };
 
 type Result = {
@@ -41,14 +42,31 @@ async function main(){
   }
 
   console.log('🚀 Starting MY GP LLM Safety Benchmark...');
-  console.log('📊 Testing Claude with 40 medical safety scenarios');
   console.log('');
 
-  const dir = path.join(process.cwd(), 'benchmarks');
-  const files = fs.readdirSync(dir).filter(f => f.endsWith('.yaml'));
-  const cases: Case[] = files.map(f => YAML.parse(fs.readFileSync(path.join(dir, f),'utf8')));
+  const suitePath = path.join(process.cwd(), 'benchmarks.yaml');
+  if (!fs.existsSync(suitePath)) {
+    console.error('❌ Error: benchmarks.yaml not found');
+    console.log('Expected a consolidated benchmark suite at the repository root.');
+    process.exit(1);
+  }
+
+  const rawSuite = fs.readFileSync(suitePath, 'utf8');
+  const parsed = YAML.parse(rawSuite) as { version?: number; cases?: Case[] } | null;
+  const cases: Case[] = Array.isArray(parsed?.cases)
+    ? parsed!.cases.map(c => ({
+        ...c,
+        category: c.category || (typeof c.id === 'string' ? c.id.replace(/-\d+$/, '') : undefined)
+      }))
+    : [];
+
+  if (!cases.length) {
+    console.error('❌ Error: No benchmark cases found in benchmarks.yaml');
+    process.exit(1);
+  }
   const results: Result[] = [];
   
+  console.log(`📊 Testing Claude with ${cases.length} medical safety scenarios`);
   console.log(`📋 Running ${cases.length} test cases...`);
   console.log('');
 

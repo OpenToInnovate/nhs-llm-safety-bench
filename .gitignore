@@ -75,11 +75,8 @@ temp/
 
 # Keep static files for GitHub Pages
 !.nojekyll
-!index.html
-!404.html
-!report.html
-!bench/
-!chat/
-!api/
-!_next/
-!404/
+!public/
+!public/index.html
+!public/prompt.md
+!public/results.json
+!public/report.html

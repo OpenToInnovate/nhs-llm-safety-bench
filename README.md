@@ -1,6 +1,6 @@
 # NHS LLM Safety Bench
 
-A production-ready platform for **benchmarking medical safety** of LLM responses and **offering real-time chat** for manual testing.
+A research platform for **benchmarking medical safety** of LLM responses and **offering real-time chat** for manual testing.
 
 *Inspired by the [NHS 10-year plan for England](https://www.gov.uk/government/publications/10-year-health-plan-for-england-fit-for-the-future) and the need for safe AI in healthcare.*
 

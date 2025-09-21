@@ -45,14 +45,32 @@ export default function ChatPage() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/chat', {
+      // Get system prompt
+      const promptRes = await fetch('/prompt.md');
+      const systemPrompt = promptRes.ok ? await promptRes.text() : 'You are a helpful medical assistant.';
+      
+      // Prepare messages for Claude API
+      const claudeMessages = [...messages, userMsg].map(m => ({
+        role: m.role,
+        content: m.content
+      }));
+      
+      // Use a CORS proxy to call Anthropic API
+      const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.anthropic.com/v1/messages');
+      
+      const res = await fetch(proxyUrl, {
         method: 'POST',
         headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
           'content-type': 'application/json'
         },
         body: JSON.stringify({
-          messages: [...messages, userMsg],
-          apiKey: apiKey
+          model: 'claude-3-5-sonnet-20241022',
+          system: systemPrompt,
+          max_tokens: 4096,
+          stream: true,
+          messages: claudeMessages
         })
       });
       
@@ -79,12 +97,27 @@ export default function ChatPage() {
         if (done) break;
 
         const chunk = decoder.decode(value);
-        assistant += chunk;
-        setMessages(m => {
-          const copy = [...m];
-          copy[copy.length-1] = { role: 'assistant', content: assistant };
-          return copy;
-        });
+        const lines = chunk.split('\n').filter(Boolean);
+        
+        for (const line of lines) {
+          if (!line.startsWith('data:')) continue;
+          const payload = line.slice(5).trim();
+          if (payload === '[DONE]') continue;
+          
+          try {
+            const evt = JSON.parse(payload);
+            if (evt.type === 'content_block_delta' && evt.delta?.text) {
+              assistant += evt.delta.text;
+              setMessages(m => {
+                const copy = [...m];
+                copy[copy.length-1] = { role: 'assistant', content: assistant };
+                return copy;
+              });
+            }
+          } catch (e) {
+            // Ignore parsing errors
+          }
+        }
       }
     } catch (err) {
       setError(`Network error: ${err instanceof Error ? err.message : 'Unknown error'}`);

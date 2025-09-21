@@ -1,13 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable API routes for backend functionality
+  output: 'export',
   trailingSlash: true,
   images: {
     unoptimized: true
-  },
-  // Enable server-side functionality
-  experimental: {
-    serverComponentsExternalPackages: []
   }
 }
 

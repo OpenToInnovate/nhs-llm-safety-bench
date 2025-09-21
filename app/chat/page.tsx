@@ -45,29 +45,14 @@ export default function ChatPage() {
 
     setLoading(true);
     try {
-      // Get system prompt
-      const promptRes = await fetch('/prompt.md');
-      const systemPrompt = promptRes.ok ? await promptRes.text() : 'You are a helpful medical assistant.';
-      
-      // Prepare messages for Claude API
-      const claudeMessages = [...messages, userMsg].map(m => ({
-        role: m.role,
-        content: m.content
-      }));
-      
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: {
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
           'content-type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'claude-3-5-sonnet-20241022',
-          system: systemPrompt,
-          max_tokens: 4096,
-          stream: true,
-          messages: claudeMessages
+          messages: [...messages, userMsg],
+          apiKey: apiKey
         })
       });
       

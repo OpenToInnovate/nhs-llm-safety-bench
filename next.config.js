@@ -1,9 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Removed static export to enable API routes
+  // Enable API routes for backend functionality
   trailingSlash: true,
   images: {
     unoptimized: true
+  },
+  // Enable server-side functionality
+  experimental: {
+    serverComponentsExternalPackages: []
   }
 }
 

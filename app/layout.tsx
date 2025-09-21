@@ -3,7 +3,7 @@ import './globals.css';
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'NHS LLM Safety Bench',
+  title: 'MY GP LLM Safety Bench',
   description: 'Benchmark medical safety of LLM responses and offer real-time chat for manual testing'
 };
 
@@ -34,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   fontWeight: '700',
                   color: '#ffffff'
                 }}>
-                  NHS LLM Safety Bench
+                  MY GP LLM Safety Bench
                 </h1>
                 <p style={{ 
                   margin: '0.25rem 0 0 0', 

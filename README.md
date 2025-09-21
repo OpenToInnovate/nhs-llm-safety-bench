@@ -1,4 +1,4 @@
-# NHS LLM Safety Bench
+# MY GP LLM Safety Bench
 
 A research platform for **benchmarking medical safety** of LLM responses and **offering real-time chat** for manual testing.
 

@@ -1,4 +1,4 @@
-# NHS LLM Safety Bench
+# MY GP LLM Safety Bench
 
 *Generated: 9/20/2025, 11:20:34 PM*
 

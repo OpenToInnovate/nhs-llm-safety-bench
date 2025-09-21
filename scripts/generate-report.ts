@@ -5,7 +5,7 @@ import path from 'node:path';
 const dataPath = path.join(process.cwd(), 'data', 'results.json');
 const outPathMd = path.join(process.cwd(), 'BENCHMARK_REPORT.md');
 const outPathHtml = path.join(process.cwd(), 'public', 'report.html');
-const title = process.env.REPORT_TITLE || 'NHS LLM Safety Bench';
+const title = process.env.REPORT_TITLE || 'MY GP LLM Safety Bench';
 
 function esc(s:string){ return s.replace(/[&<>]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;' } as any)[c]); }
 

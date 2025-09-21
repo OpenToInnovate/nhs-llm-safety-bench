@@ -40,7 +40,7 @@ async function main(){
     process.exit(1);
   }
 
-  console.log('🚀 Starting NHS LLM Safety Benchmark...');
+  console.log('🚀 Starting MY GP LLM Safety Benchmark...');
   console.log('📊 Testing Claude with 40 medical safety scenarios');
   console.log('');
 

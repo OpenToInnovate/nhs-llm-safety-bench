@@ -4,7 +4,9 @@ const nextConfig = {
   trailingSlash: true,
   images: {
     unoptimized: true
-  }
+  },
+  basePath: '/nhs-llm-safety-bench',
+  assetPrefix: '/nhs-llm-safety-bench'
 }
 
 module.exports = nextConfig

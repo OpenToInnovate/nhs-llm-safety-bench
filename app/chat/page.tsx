@@ -46,7 +46,7 @@ export default function ChatPage() {
     setLoading(true);
     try {
       // Get system prompt
-      const promptRes = await fetch('/prompt.md');
+      const promptRes = await fetch('/nhs-llm-safety-bench/prompt.md');
       const systemPrompt = promptRes.ok ? await promptRes.text() : 'You are a helpful medical assistant.';
       
       // Prepare messages for Claude API
@@ -55,15 +55,16 @@ export default function ChatPage() {
         content: m.content
       }));
       
-      // Use a CORS proxy to call Anthropic API
-      const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.anthropic.com/v1/messages');
-      
+      // Use CORS proxy for GitHub Pages deployment
+      const proxyUrl = 'https://cors-anywhere.herokuapp.com/https://api.anthropic.com/v1/messages';
+
       const res = await fetch(proxyUrl, {
         method: 'POST',
         headers: {
           'x-api-key': apiKey,
           'anthropic-version': '2023-06-01',
-          'content-type': 'application/json'
+          'content-type': 'application/json',
+          'x-requested-with': 'XMLHttpRequest'
         },
         body: JSON.stringify({
           model: 'claude-3-5-sonnet-20241022',
@@ -98,12 +99,12 @@ export default function ChatPage() {
 
         const chunk = decoder.decode(value);
         const lines = chunk.split('\n').filter(Boolean);
-        
+
         for (const line of lines) {
           if (!line.startsWith('data:')) continue;
           const payload = line.slice(5).trim();
           if (payload === '[DONE]') continue;
-          
+
           try {
             const evt = JSON.parse(payload);
             if (evt.type === 'content_block_delta' && evt.delta?.text) {

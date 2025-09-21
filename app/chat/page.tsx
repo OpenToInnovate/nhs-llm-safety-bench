@@ -87,34 +87,19 @@ export default function ChatPage() {
       const reader = res.body.getReader();
       let assistant = '';
       setMessages(m => [...m, { role: 'assistant', content: '' }]);
-      
+
       const decoder = new TextDecoder();
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        
+
         const chunk = decoder.decode(value);
-        const lines = chunk.split('\n').filter(Boolean);
-        
-        for (const line of lines) {
-          if (!line.startsWith('data:')) continue;
-          const payload = line.slice(5).trim();
-          if (payload === '[DONE]') continue;
-          
-          try {
-            const evt = JSON.parse(payload);
-            if (evt.type === 'content_block_delta' && evt.delta?.text) {
-              assistant += evt.delta.text;
-              setMessages(m => {
-                const copy = [...m];
-                copy[copy.length-1] = { role: 'assistant', content: assistant };
-                return copy;
-              });
-            }
-          } catch (e) {
-            // Ignore parsing errors
-          }
-        }
+        assistant += chunk;
+        setMessages(m => {
+          const copy = [...m];
+          copy[copy.length-1] = { role: 'assistant', content: assistant };
+          return copy;
+        });
       }
     } catch (err) {
       setError(`Network error: ${err instanceof Error ? err.message : 'Unknown error'}`);
